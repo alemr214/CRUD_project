@@ -4,15 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
 
-/**
- *
- * @author crist
- */
 public class MySQLConnection {
 
-    // Configura tus credenciales y detalles de conexión
+    // Configuracion inicial para la conexion
     private static final String URL = "jdbc:mysql://localhost:3306/";
     private static final String USER = "root";
     private static final String PASSWORD = "0402";
@@ -34,42 +29,12 @@ public class MySQLConnection {
 
     public void useSchema() {
         try {
-            String createSchemaSQL = "USE " + this.SCHEMA;
-            statement.executeUpdate(createSchemaSQL);
+            String useSchema = "USE " + this.SCHEMA;
+            statement.executeUpdate(useSchema);
 
             System.out.println("El Schema usado es: " + this.SCHEMA);
         } catch (SQLException e) {
             System.err.print("Error al usar el schema: " + e.getMessage());
-        }
-    }
-
-    public void showSchemas() {
-        try {
-            String createSchemaSQL = "SHOW SCHEMAS";
-            ResultSet resultSet = statement.executeQuery(createSchemaSQL);
-
-            System.out.println("Los Schema encontrados, son los siguientes: ");
-            while (resultSet.next()) {
-                String tableName = resultSet.getString(1); // El índice 1 representa la primera columna
-                System.out.println("Schema: " + tableName);
-            }
-        } catch (SQLException e) {
-            System.err.print("Error al listar los schema's: " + e.getMessage());
-        }
-    }
-
-    public void showTables() {
-        try {
-            String showTables = "SHOW TABLES";
-            ResultSet resultSet = statement.executeQuery(showTables);
-
-            System.out.println("Las tablas que tienen son: ");
-            while (resultSet.next()) {
-                String tableName = resultSet.getString(1); // El índice 1 representa la primera columna
-                System.out.println("Tabla: " + tableName);
-            }
-        } catch (SQLException e) {
-            System.err.print("Error al listar los schema's: " + e.getMessage());
         }
     }
 
@@ -87,6 +52,10 @@ public class MySQLConnection {
         } catch (SQLException e) {
             System.err.println("Error al conectar a la base de datos: " + e.getMessage());
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     // Método para cerrar la conexión

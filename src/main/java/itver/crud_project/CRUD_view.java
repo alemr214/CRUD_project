@@ -4,17 +4,115 @@
  */
 package itver.crud_project;
 
+import conn.MySQLConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author alemr214
  */
 public class CRUD_view extends javax.swing.JFrame {
 
+    private MySQLConnection conexion = new MySQLConnection();
+
+    // ...
+    public void inicializarConexion() {
+        try {
+            conexion.connectSchema();
+            conexion.useSchema();
+            conexion.openConnection();
+        } catch (SQLException e) {
+            System.out.println("El error es: " + e.getMessage());
+        }
+    }
+
+    public void cerrarConexion() {
+        try {
+            conexion.closeConnection();
+        } catch (SQLException e) {
+            System.out.println("El error es: " + e.getMessage());
+        }
+    }
+
     /**
      * Creates new form CRUD_view
      */
     public CRUD_view() {
         initComponents();
+
+        // Inicializa la instancia de MySQLConnection
+    }
+
+    private void insertarPersonal(String nombre, String apePat, String apeMat, String curp, String adscripcion, String tipoContrato, String puesto, String fechaNac, String sexo, String estado) {
+        String sql = "INSERT INTO personal (nombre, apePat, apeMat, curp, adscripcion, tipoContrato, puesto, fechaNac, sexo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = conexion.getConnection().prepareStatement(sql)) {
+            statement.setString(1, nombre);
+            statement.setString(2, apePat);
+            statement.setString(3, apeMat);
+            statement.setString(4, curp);
+            statement.setString(5, adscripcion);
+            statement.setString(6, tipoContrato);
+            statement.setString(7, puesto);
+            statement.setString(8, fechaNac);
+            statement.setString(9, sexo);
+            statement.setString(10, estado);
+            //statement.setBytes(11, fotoPersonal);
+
+            int filasInsertadas = statement.executeUpdate();
+            if (filasInsertadas > 0) {
+                JOptionPane.showMessageDialog(null, "Registro insertado correctamente.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al insertar el registro.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al insertar el registro: " + e.getMessage());
+        }
+    }
+
+    private void eliminarPersonal(int idPersonal) {
+        String sql = "DELETE FROM personal WHERE idPersonal = ?";
+        try (PreparedStatement statement = conexion.getConnection().prepareStatement(sql)) {
+            statement.setInt(1, idPersonal);
+
+            int filasEliminadas = statement.executeUpdate();
+            if (filasEliminadas > 0) {
+                JOptionPane.showMessageDialog(null, "Registro eliminado correctamente.");
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró el registro a eliminar.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
+        }
+    }
+
+    private void modificarPersonal(int idPersonal, String nombre, String apePat, String apeMat, String curp, String adscripcion, String tipoContrato, String puesto, String fechaNac, String sexo, String estado) {
+        String sql = "UPDATE personal SET nombre=?, apePat=?, apeMat=?, curp=?, adscripcion=?, tipoContrato=?, puesto=?, fechaNac=?, sexo=?, estado=? WHERE idPersonal=?";
+        try (PreparedStatement statement = conexion.getConnection().prepareStatement(sql)) {
+            statement.setString(1, nombre);
+            statement.setString(2, apePat);
+            statement.setString(3, apeMat);
+            statement.setString(4, curp);
+            statement.setString(5, adscripcion);
+            statement.setString(6, tipoContrato);
+            statement.setString(7, puesto);
+            statement.setString(8, fechaNac);
+            statement.setString(9, sexo);
+            statement.setString(10, estado);
+            //statement.setBytes(11, fotoPersonal);
+            statement.setInt(11, idPersonal);
+
+            int filasModificadas = statement.executeUpdate();
+            if (filasModificadas > 0) {
+                JOptionPane.showMessageDialog(null, "Registro modificado correctamente.");
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró el registro a modificar.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al modificar el registro: " + e.getMessage());
+        }
     }
 
     /**
@@ -99,10 +197,25 @@ public class CRUD_view extends javax.swing.JFrame {
         jScrollPane.setViewportView(jTable);
 
         guardarButton.setText("Guardar");
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarButtonActionPerformed(evt);
+            }
+        });
 
         modificarButton.setText("Modificar");
+        modificarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                modificarButtonActionPerformed(evt);
+            }
+        });
 
         eliminarButton.setText("Eliminar");
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarButtonActionPerformed(evt);
+            }
+        });
 
         guardarFotoButton.setText("Guardar foto");
 
@@ -227,6 +340,49 @@ public class CRUD_view extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
+        String nombre = this.nameTextField.getText();
+        String apePat = lastNameTextField.getText();
+        String apeMat = lastNameTextField2.getText();
+        String curp = curpTextField.getText();
+        String adscripcion = adscripcionTextField.getText();
+        String tipoContrato = contratoTextField.getText();
+        String puesto = puestoTextField.getText();
+        String fechaNac = birthTextField.getText();
+        String sexo = sexTextField.getText();
+        String estado = (String) stateComboBox.getSelectedItem();
+
+
+        // Aquí deberías obtener la foto (LONGBLOB) y guardarla en una variable byte[]
+
+        // Ahora puedes ejecutar la inserción en la base de datos
+        insertarPersonal(nombre, apePat, apeMat, curp, adscripcion, tipoContrato, puesto, fechaNac, sexo, estado);
+        }//GEN-LAST:event_guardarButtonActionPerformed
+
+    private void modificarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modificarButtonActionPerformed
+        int idPersonal = Integer.parseInt(idTextField.getText());
+        String nombre = nameTextField.getText();
+        String apePat = lastNameTextField.getText();
+        String apeMat = lastNameTextField2.getText();
+        String curp = curpTextField.getText();
+        String adscripcion = adscripcionTextField.getText();
+        String tipoContrato = contratoTextField.getText();
+        String puesto = puestoTextField.getText();
+        String fechaNac = birthTextField.getText();
+        String sexo = sexTextField.getText();
+        String estado = (String) stateComboBox.getSelectedItem();
+
+        // Aquí deberías obtener la foto (LONGBLOB) y guardarla en una variable byte[]
+        // Ahora puedes ejecutar la modificación en la base de datos
+        modificarPersonal(idPersonal, nombre, apePat, apeMat, curp, adscripcion, tipoContrato, puesto, fechaNac, sexo, estado);
+
+    }//GEN-LAST:event_modificarButtonActionPerformed
+
+    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+        int idPersonal = Integer.parseInt(idTextField.getText());
+        eliminarPersonal(idPersonal);
+    }//GEN-LAST:event_eliminarButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -241,16 +397,24 @@ public class CRUD_view extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CRUD_view.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CRUD_view.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CRUD_view.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CRUD_view.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CRUD_view.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CRUD_view.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CRUD_view.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CRUD_view.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -260,6 +424,7 @@ public class CRUD_view extends javax.swing.JFrame {
                 new CRUD_view().setVisible(true);
             }
         });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
