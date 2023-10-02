@@ -5,7 +5,6 @@
 package itver.crud_project;
 
 import conn.MySQLConnection;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
@@ -14,16 +13,16 @@ import javax.swing.JOptionPane;
  *
  * @author alemr214
  */
-public class CRUD_view extends javax.swing.JFrame {
+public final class CRUD_view extends javax.swing.JFrame {
 
-    private MySQLConnection conexion = new MySQLConnection();
+    private final MySQLConnection conexion = new MySQLConnection();
 
     // ...
     public void inicializarConexion() {
         try {
+            conexion.openConnection();
             conexion.connectSchema();
             conexion.useSchema();
-            conexion.openConnection();
         } catch (SQLException e) {
             System.out.println("El error es: " + e.getMessage());
         }
@@ -43,6 +42,7 @@ public class CRUD_view extends javax.swing.JFrame {
     public CRUD_view() {
         initComponents();
 
+        inicializarConexion();
         // Inicializa la instancia de MySQLConnection
     }
 
@@ -352,9 +352,7 @@ public class CRUD_view extends javax.swing.JFrame {
         String sexo = sexTextField.getText();
         String estado = (String) stateComboBox.getSelectedItem();
 
-
         // Aquí deberías obtener la foto (LONGBLOB) y guardarla en una variable byte[]
-
         // Ahora puedes ejecutar la inserción en la base de datos
         insertarPersonal(nombre, apePat, apeMat, curp, adscripcion, tipoContrato, puesto, fechaNac, sexo, estado);
         }//GEN-LAST:event_guardarButtonActionPerformed
@@ -423,6 +421,7 @@ public class CRUD_view extends javax.swing.JFrame {
             public void run() {
                 new CRUD_view().setVisible(true);
             }
+
         });
 
     }
